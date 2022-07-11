@@ -58,20 +58,22 @@ class _TodoListPageState extends State<TodoListPage> {
 
   void _toggleTodo(Todo todo) {
     setState(() {
-      todo.isDone = ! todo.isDone;
+      todo.isDone = !todo.isDone;
     });
   }
 
   Widget _buildItemWidget(Todo todo) {
     return ListTile(
-        onTap: () {},
-        title: Text(
-            todo.title,
-            style: todo.isDone ? const TextStyle(
-              decoration: TextDecoration.lineThrough,
-              fontStyle: FontStyle.italic,
-            ) : null,
-        ),
+      onTap: () {},
+      title: Text(
+        todo.title,
+        style: todo.isDone
+            ? const TextStyle(
+                decoration: TextDecoration.lineThrough,
+                fontStyle: FontStyle.italic,
+              )
+            : null,
+      ),
       trailing: IconButton(
         icon: const Icon(Icons.delete_forever),
         onPressed: () => _deleteTodo(todo),
@@ -102,14 +104,36 @@ class _TodoListPageState extends State<TodoListPage> {
                 ),
               ],
             ),
-            Expanded(
-              child: ListView(
-                children: _items.map((todo) => _buildItemWidget(todo)).toList(),
-              ),
-            )
+            FutureBuilder<List<Todo>>(
+              future: _fetchTodoData(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text(
+                    "There was an error",
+                    style: Theme.of(context).textTheme.headline2,
+                  );
+                } else if (snapshot.hasData) {
+                  return Expanded(
+                    child: ListView(
+                      children: (snapshot.data)!.map((todo) => _buildItemWidget(todo))
+                          .toList(),
+                    ),
+                  );
+                } else {
+                  return Text(
+                    "No data",
+                    style: Theme.of(context).textTheme.headline2,
+                  );
+                }
+              },
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Future<List<Todo>> _fetchTodoData() {
+    return Future.delayed(const Duration(seconds: 3), () => _items);
   }
 }
