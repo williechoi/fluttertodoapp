@@ -133,7 +133,8 @@ class _TodoListPageState extends State<TodoListPage> {
     );
   }
 
-  Future<List<Todo>> _fetchTodoData() {
-    return Future.delayed(const Duration(seconds: 3), () => _items);
+  Future<List<Todo>> _fetchTodoData() async {
+    final items = await Future.delayed(const Duration(seconds: 3), () => _items);
+    return items;
   }
 }
